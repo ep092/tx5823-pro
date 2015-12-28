@@ -241,7 +241,9 @@ bool hasReceivedPayload() {
         }
         while(millis() < receive_timeout && i <= 10);
         call_sign_temp[i] = '\0';
-        while(Serial.available() > 0){Serial.read();Serial.flush();delay(1);}; // clear teh remaining buffer
+
+        receive_timeout = millis()+10;
+        while(Serial.available() > 0 && millis() < receive_timeout){Serial.read();Serial.flush();delay(1);}; // clear teh remaining buffer
 
         if(check_sum == (uint8_t) check_sum_temp && total_bytes_read > 2 && found_start && found_end) { // save valid channelIndex and call_sign
             channelIndex = channelIndex_temp;
