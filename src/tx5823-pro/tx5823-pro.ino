@@ -76,7 +76,7 @@ const uint8_t channelNames[] PROGMEM = {
 };
 
 bool channel_sent = false;
-char call_sign[10];
+char call_sign[11];
 uint8_t channelIndex = 0;
 uint8_t state = 255; // force redraw
 unsigned long timeout = 0;
@@ -207,7 +207,7 @@ bool hasReceivedPayload() {
         bool found_end = false,found_start = false;
         uint8_t i = 0;
         uint8_t check_sum_temp = 0, check_sum = 0;
-        char call_sign_temp[10] = "";
+        char call_sign_temp[11] = "";
         uint8_t channelIndex_temp = 0;
         uint8_t total_bytes_read = 0;
         do{
