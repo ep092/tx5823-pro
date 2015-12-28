@@ -25,6 +25,10 @@ SOFTWARE.
 #ifndef settings_h
 #define settings_h
 
+
+//#define USE_FLIP_SCREEN
+#define USE_BOOT_LOGO
+
 // this will be displayed on the screensaver.
 // Up to 10 letters
 #define CALL_SIGN "CALL SIGN"

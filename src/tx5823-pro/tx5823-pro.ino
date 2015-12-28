@@ -171,7 +171,7 @@ void loop()
             set_5823_freq(channelIndex);
         }
         digitalWrite(led,(millis() %2000 > 1000)); // blink LED fast in bind mode
-        if(millis() % 1000 == 0 || forceRedraw) {
+        if(millis() % 500 == 0 || forceRedraw) {
             drawScreen.screenSaver(pgm_read_byte_near(channelNames + channelIndex), pgm_read_word_near(channelFreqTable + channelIndex), call_sign, forceRedraw);
 
         }

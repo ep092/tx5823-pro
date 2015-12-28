@@ -36,6 +36,7 @@ SOFTWARE.
 char PSTR2_BUFFER[30]; // adjust size depending on need.
 char *PSTRtoBuffer_P(PGM_P str) { uint8_t c='\0', i=0; for(; (c = pgm_read_byte(str)) && i < sizeof(PSTR2_BUFFER); str++, i++) PSTR2_BUFFER[i]=c;PSTR2_BUFFER[i]=c; return PSTR2_BUFFER;}
 
+#define INVERT INVERSE
 #define OLED_RESET 4
 Adafruit_SSD1306 display(OLED_RESET);
 
@@ -52,8 +53,16 @@ char screens::begin(const char *call_sign) {
     // Set the address of your OLED Display.
     // 128x32 ONLY!!
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D or 0x3C (for the 128x64)
+#ifdef USE_FLIP_SCREEN
+    flip();
+#endif
+
+#ifdef USE_BOOT_LOGO
+    display.display(); // show splash screen
+    delay(3000);
+#endif
     // init done
-    reset();
+/*    reset();
     display.setTextColor(WHITE);
     display.setCursor(0,0);
     display.print(PSTR2("Booting up..."));
@@ -64,10 +73,13 @@ char screens::begin(const char *call_sign) {
     display.print(call_sign);
     display.display();
     delay(2000);
+*/
     return 0; // no errors
 }
 
 void screens::reset() {
+    display.invertDisplay(false);
+    display.stopscroll();
     display.clearDisplay();
     display.setCursor(0,0);
     display.setTextSize(1);
@@ -80,6 +92,7 @@ void screens::flip() {
 
 
 void screens::updateFrequencyInformation(uint8_t channelName, uint16_t channelFrequency, const char *call_sign) {
+    display.stopscroll();
     reset();
     display.setTextSize(1);
     display.setCursor(48,0);
@@ -91,7 +104,7 @@ void screens::updateFrequencyInformation(uint8_t channelName, uint16_t channelFr
     display.setCursor(48+(12*4),15);
     display.setTextSize(1);
     display.print("Ghz");
-    display.drawPixel(48+(8*1+3),21, WHITE);
+    display.drawPixel(48+(8*1+2),21, WHITE);
 
     display.setTextSize(4);
     display.setTextColor(WHITE);
@@ -149,6 +162,54 @@ void screens::screenSaver(uint8_t channelName, uint16_t channelFrequency, const 
     if(force_redraw) {
         updateFrequencyInformation(channelName, channelFrequency, call_sign);
     }
-    updateStatus("TRANSMITTING");
-    display.display();
+    if(millis() % 17000 >= 5000) {
+        //display.startscrollright(0x00, 0x0F);
+        alternateScreenSaver(channelName, channelFrequency, call_sign);
+    }
+    else {
+        updateFrequencyInformation(channelName, channelFrequency, call_sign);
+        updateStatus("TRANSMITTING");
+        display.display();
+    }
+}
+
+void screens::alternateScreenSaver(uint8_t channelName, uint16_t channelFrequency, const char *call_sign) {
+
+    if(millis() % 17000 == 5000) {
+        reset();
+        // DRAW CALL SIGN
+        display.setCursor(((display.width() - (strlen(call_sign)*12)) / 2),8);
+        display.setTextSize(2);
+        display.setTextColor(WHITE);
+        display.print(call_sign);
+        display.display();
+        display.startscrollleft(0x00, 0x0F);
+    }
+
+    //display.drawPixel(((display.width()) / 2),31, WHITE);
+    if(millis() % 17000 == 9000 ) {
+        reset();
+        display.setTextSize(4);
+        display.setCursor(((display.width() - (4*24)) / 2),2);
+        display.setTextColor(WHITE);
+        display.print(channelFrequency);
+        display.setCursor(48,25);
+        display.setCursor(((display.width() - (4*24)) / 2)+(24*4)-2,23);
+        display.setTextSize(1);
+        display.print("Ghz");
+        display.drawPixel(((display.width() - (4*24)) / 2)+24-2,29, WHITE);
+        display.display();
+        display.startscrollright(0x00, 0x0F);
+    }
+
+    if(millis() % 17000 == 13000 ) {
+        reset();
+        display.setTextSize(4);
+        display.setTextColor(WHITE);
+        display.setCursor(((display.width() - (2*23)) / 2),2);
+        display.print(channelName, HEX);
+        display.display();
+        display.startscrollleft(0x00, 0x0F);
+    }
+
 }

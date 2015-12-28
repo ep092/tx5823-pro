@@ -49,6 +49,7 @@ class screens
 
         // SCREEN SAVER
         void screenSaver(uint8_t channelName, uint16_t channelFrequency, const char *call_sign, bool force_redraw);
+        void alternateScreenSaver(uint8_t channelName, uint16_t channelFrequency, const char *call_sign);
 
 
 };
