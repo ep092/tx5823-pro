@@ -167,16 +167,15 @@ void loop()
 
 
     if(state == STATE_SCREEN_TRANSMITTING) {
+        digitalWrite(led,(millis() %2000 > 1000)); // blink LED slow in transmit mode
+        if(millis() % 500 == 0 || forceRedraw) {
+            drawScreen.screenSaver(pgm_read_byte_near(channelNames + channelIndex), pgm_read_word_near(channelFreqTable + channelIndex), call_sign, forceRedraw);
+        }
         if(!channel_sent) {
             channel_sent = true;
             delay(150);
             // tell transmitter to be on the correct channel.
             set_5823_freq(channelIndex);
-        }
-        digitalWrite(led,(millis() %2000 > 1000)); // blink LED fast in bind mode
-        if(millis() % 500 == 0 || forceRedraw) {
-            drawScreen.screenSaver(pgm_read_byte_near(channelNames + channelIndex), pgm_read_word_near(channelFreqTable + channelIndex), call_sign, forceRedraw);
-
         }
     }
 
@@ -188,7 +187,6 @@ void loop()
             state = STATE_BIND_MODE_RECEIVED;
             timeout = millis()+3000;
             digitalWrite(led, HIGH); // Stay solid indecating a payload was received
-            set_5823_freq(channelIndex);
         }
         if(timeout < millis()) {
             state = STATE_BIND_MODE; // return to flashing bind mode.
@@ -322,4 +320,5 @@ void spi_write(uint8_t addr, uint32_t data)
     digitalWrite(slaveSelectPin, HIGH);
     delayMicroseconds(1);
     digitalWrite(spiDataPin, LOW);
+    delayMicroseconds(1);
 }
