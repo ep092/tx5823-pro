@@ -143,13 +143,17 @@ void screens::bindMode(uint8_t state, uint8_t channelName, uint16_t channelFrequ
     display.display();
 }
 
+unsigned long last_redraw = 0;
+unsigned long next_screen = 0;
+uint8_t screenSaverState = 0;
 // SCREEN SAVER
 void screens::screenSaver(uint8_t channelName, uint16_t channelFrequency, const char *call_sign, bool force_redraw){
     if(force_redraw) {
-        updateFrequencyInformation(channelName, channelFrequency, call_sign);
+        screenSaverState = 0;
+        last_redraw = millis();
+        next_screen = 0;
     }
-    if(millis() % 17000 >= 5000) {
-        //display.startscrollright(0x00, 0x0F);
+    if((millis()-last_redraw) % 17000 >= 5000) {
         alternateScreenSaver(channelName, channelFrequency, call_sign);
     }
     else {
@@ -160,42 +164,48 @@ void screens::screenSaver(uint8_t channelName, uint16_t channelFrequency, const 
 }
 
 void screens::alternateScreenSaver(uint8_t channelName, uint16_t channelFrequency, const char *call_sign) {
+    if(millis() > next_screen) {
+        next_screen = millis() + 3995; // change every 4 seconds
+        switch(screenSaverState) {
+            case 0:
+                reset();
+                // DRAW CALL SIGN
+                display.setCursor(((display.width() - (strlen(call_sign)*12)) / 2),8);
+                display.setTextSize(2);
+                display.setTextColor(WHITE);
+                display.print(call_sign);
+                display.display();
+                display.startscrollleft(0x00, 0x0F);
+                screenSaverState = 1;
+                break;
+            case 1:
+                reset();
+                display.setTextSize(4);
+                display.setCursor(((display.width() - (4*24)) / 2),2);
+                display.setTextColor(WHITE);
+                display.print(channelFrequency);
+                display.setCursor(48,25);
+                display.setCursor(((display.width() - (4*24)) / 2)+(24*4)-2,23);
+                display.setTextSize(1);
+                display.print("Ghz");
+                display.drawPixel(((display.width() - (4*24)) / 2)+24-2,29, WHITE);
+                display.display();
+                display.startscrollright(0x00, 0x0F);
+                screenSaverState = 2;
+                break;
 
-    if(millis() % 17000 == 5000) {
-        reset();
-        // DRAW CALL SIGN
-        display.setCursor(((display.width() - (strlen(call_sign)*12)) / 2),8);
-        display.setTextSize(2);
-        display.setTextColor(WHITE);
-        display.print(call_sign);
-        display.display();
-        display.startscrollleft(0x00, 0x0F);
-    }
+            case 2:
+                reset();
+                display.setTextSize(4);
+                display.setTextColor(WHITE);
+                display.setCursor(((display.width() - (2*23)) / 2),2);
+                display.print(channelName, HEX);
+                display.display();
+                display.startscrollleft(0x00, 0x0F);
+                screenSaverState = 0;
+                break;
+        }
 
-    //display.drawPixel(((display.width()) / 2),31, WHITE);
-    if(millis() % 17000 == 9000 ) {
-        reset();
-        display.setTextSize(4);
-        display.setCursor(((display.width() - (4*24)) / 2),2);
-        display.setTextColor(WHITE);
-        display.print(channelFrequency);
-        display.setCursor(48,25);
-        display.setCursor(((display.width() - (4*24)) / 2)+(24*4)-2,23);
-        display.setTextSize(1);
-        display.print("Ghz");
-        display.drawPixel(((display.width() - (4*24)) / 2)+24-2,29, WHITE);
-        display.display();
-        display.startscrollright(0x00, 0x0F);
-    }
-
-    if(millis() % 17000 == 13000 ) {
-        reset();
-        display.setTextSize(4);
-        display.setTextColor(WHITE);
-        display.setCursor(((display.width() - (2*23)) / 2),2);
-        display.print(channelName, HEX);
-        display.display();
-        display.startscrollleft(0x00, 0x0F);
     }
 
 }
