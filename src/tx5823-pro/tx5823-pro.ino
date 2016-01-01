@@ -121,14 +121,9 @@ void setup()
     }
 
 
-    // set channel on boot
-    channel_sent = true;
-    set_5823_freq(channelIndex);
-
-    // Setup Done - LED ON
-    digitalWrite(led, HIGH);
 
     delay(100); // give some time for screen to power on.
+
 
     // Init Display
     if (drawScreen.begin(call_sign) > 0) {
@@ -138,12 +133,20 @@ void setup()
             delay(100);
         }
     }
-    // rodate the display output 180 degrees.
-    // drawScreen.flip();
+
+
+    // set channel on boot
+    channel_sent = true;
+    set_5823_freq(channelIndex);
+#ifdef USE_BOOT_LOGO
+    // display logo for 3 seconds regaurdless of which module being used.
+    delay(3000-VTX_POWER_ON_DELAY);
+#endif
 
     Serial.begin(9600);
 
-
+    // Setup Done - LED OFF
+    digitalWrite(led, LOW);
 }
 
 // LOOP ----------------------------------------------------------------------------
@@ -268,6 +271,10 @@ bool hasReceivedPayload() {
 void set_5823_freq(uint8_t freq)
 {
     uint32_t channelData;
+
+    // some modules need a delay bfore we send the commands
+    delay(VTX_POWER_ON_DELAY);
+
     // read in the channel information from the table, and add 0x00 04 00 00 to it
     channelData = (pgm_read_word_near(channelTable + freq)) + 0x00040000;
 

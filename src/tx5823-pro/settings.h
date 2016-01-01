@@ -29,6 +29,13 @@ SOFTWARE.
 //#define USE_FLIP_SCREEN
 #define USE_BOOT_LOGO
 
+
+// Choose which vTX module you are using.
+// see below for details of why this is necessary
+#define TX5823
+//#define TX5823N
+//#define FX758
+
 // this will be displayed on the screensaver.
 // Up to 10 letters
 #define CALL_SIGN "CALL SIGN"
@@ -58,5 +65,27 @@ SOFTWARE.
 #define STATE_BIND_MODE_RECEIVED 3
 #define STATE_BIND_MODE_FAILED 4
 
+
+#ifdef TX5823
+    // Year 2012
+    // 3.3v
+    // SPI Mod Required
+    // the TX5823-120228 needs atleast 1.5 seconds before sending the channel via SPI
+    #define VTX_POWER_ON_DELAY 1500
+#endif
+#ifdef TX5823N
+    // Year 2015
+    // 3.3v
+    // SPI Mod Required
+    // the TX5823N_150116 needs atleast 0.1 seconds before sending the channel via SPI
+    #define VTX_POWER_ON_DELAY 100
+#endif
+#ifdef FX758
+    // Year 2014
+    // 5.5v
+    // SPI Mod NOT Required
+    // the FX758-141125 needs atleast 1.5 seconds before sending the channel via SPI
+    #define VTX_POWER_ON_DELAY 1500
+#endif
 
 #endif // file_defined
