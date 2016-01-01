@@ -59,21 +59,7 @@ char screens::begin(const char *call_sign) {
 
 #ifdef USE_BOOT_LOGO
     display.display(); // show splash screen
-    delay(3000);
 #endif
-    // init done
-/*    reset();
-    display.setTextColor(WHITE);
-    display.setCursor(0,0);
-    display.print(PSTR2("Booting up..."));
-
-    display.display();
-    display.setCursor(((display.width() - (strlen(call_sign)*12)) / 2),8*1+4);
-    display.setTextSize(2);
-    display.print(call_sign);
-    display.display();
-    delay(2000);
-*/
     return 0; // no errors
 }
 
