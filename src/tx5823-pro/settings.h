@@ -85,7 +85,7 @@ SOFTWARE.
     // 5.5v
     // SPI Mod NOT Required
     // the FX758-141125 needs atleast 1.5 seconds before sending the channel via SPI
-    #define VTX_POWER_ON_DELAY 1500
+    #define VTX_POWER_ON_DELAY 100
 #endif
 
 #endif // file_defined
