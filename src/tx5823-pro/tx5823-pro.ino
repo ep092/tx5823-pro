@@ -154,6 +154,18 @@ void setup()
 
     // Setup Done - LED OFF
     digitalWrite(led, LOW);
+    
+#ifdef EASYMODE_RACEBAND 
+   uint8_t i=0; //32 39
+    while (1){
+      if (digitalRead(bindSwitch)==HIGH){
+        i++;
+        if (i>=40) i=32;
+        set_5823_freq(i);
+        delay(1000);
+      }
+    }
+#endif
 }
 
 // LOOP ----------------------------------------------------------------------------

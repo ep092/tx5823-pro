@@ -25,6 +25,10 @@ SOFTWARE.
 #ifndef settings_h
 #define settings_h
 
+//enable to use RACEBAND only and channel change by pressing the button
+#define EASYMODE_RACEBAND 
+
+
 //enable if display is used
 //#define USE_DISPLAY
 
