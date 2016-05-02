@@ -25,6 +25,8 @@ SOFTWARE.
 #ifndef settings_h
 #define settings_h
 
+//enable if display is used
+//#define USE_DISPLAY
 
 //#define USE_FLIP_SCREEN
 #define USE_BOOT_LOGO

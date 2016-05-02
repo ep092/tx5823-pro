@@ -37,13 +37,19 @@ SOFTWARE.
 
 #include "settings.h"
 
+#ifdef USE_DISPLAY
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
+#endif
+
 #include <Wire.h>
 #include <SPI.h>
 
+
 #include "screens.h"
+//#ifdef USE_DISPLAY
 screens drawScreen;
+//#endif
 
 // Channels to sent to the SPI registers
 const uint16_t channelTable[] PROGMEM = {
@@ -122,8 +128,8 @@ void setup()
 
 
 
+    #ifdef USE_DISPLAY
     delay(100); // give some time for screen to power on.
-
 
     // Init Display
     if (drawScreen.begin(call_sign) > 0) {
@@ -133,7 +139,7 @@ void setup()
             delay(100);
         }
     }
-
+    #endif
 
     // set channel on boot
     channel_sent = true;
@@ -142,6 +148,7 @@ void setup()
     // display logo for 3 seconds regaurdless of which module being used.
     delay(3000-VTX_POWER_ON_DELAY);
 #endif
+
 
     Serial.begin(9600);
 
@@ -155,10 +162,10 @@ void loop()
     static uint8_t last_state = state;
     bool forceRedraw = false; // force a full screen redraw
     if(digitalRead(bindSwitch) == HIGH) {
-        state = (state == STATE_SCREEN_TRANSMITTING || state == 255) ? STATE_BIND_MODE : state;
+        state = (state == STATE_SCREEN_TRANSMITTING || state == 255) ? STATE_BIND_MODE : state; //if last state was STATE_SCREEN_TRANSMITTING or 255 (from init)
     }
     else {
-        state = STATE_SCREEN_TRANSMITTING;
+        state = STATE_SCREEN_TRANSMITTING;  //falls button nicht gedrückt ist
     }
 
     if(state != last_state) {
@@ -169,7 +176,9 @@ void loop()
     if(state == STATE_SCREEN_TRANSMITTING) {
         digitalWrite(led,(millis() %2000 > 1000)); // blink LED slow in transmit mode
         if(millis() % 500 == 0 || forceRedraw) {
-            drawScreen.screenSaver(pgm_read_byte_near(channelNames + channelIndex), pgm_read_word_near(channelFreqTable + channelIndex), call_sign, forceRedraw);
+          #ifdef USE_DISPLAY
+          drawScreen.screenSaver(pgm_read_byte_near(channelNames + channelIndex), pgm_read_word_near(channelFreqTable + channelIndex), call_sign, forceRedraw);
+          #endif
         }
         if(!channel_sent) {
             channel_sent = true;
@@ -193,7 +202,9 @@ void loop()
             digitalWrite(led, (millis() % 250 > 125)); // blink LED fast in bind mode
         }
         if(millis() % 125 == 0 || forceRedraw) {
-            drawScreen.bindMode(state, pgm_read_byte_near(channelNames + channelIndex), pgm_read_word_near(channelFreqTable + channelIndex), call_sign, forceRedraw);
+        #ifdef USE_DISPLAY
+          drawScreen.bindMode(state, pgm_read_byte_near(channelNames + channelIndex), pgm_read_word_near(channelFreqTable + channelIndex), call_sign, forceRedraw);
+        #endif
         }
     }
     last_state = state;
