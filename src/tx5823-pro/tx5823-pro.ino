@@ -156,12 +156,14 @@ void setup()
     digitalWrite(led, LOW);
     
 #ifdef EASYMODE_RACEBAND 
-   uint8_t i=0; //32 39
+   uint8_t i=channelIndex; //32 39
     while (1){
       if (digitalRead(bindSwitch)==HIGH){
         i++;
-        if (i>=40) i=32;
+        if (i>39) i=8;
+        if (i<32) i=32;
         set_5823_freq(i);
+        EEPROM.write(EEPROM_ADR_TUNE,i);
         delay(1000);
       }
     }
