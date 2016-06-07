@@ -40,8 +40,10 @@ char *PSTRtoBuffer_P(PGM_P str) { uint8_t c='\0', i=0; for(; (c = pgm_read_byte(
 #define OLED_RESET 4
 Adafruit_SSD1306 display(OLED_RESET);
 
+#ifdef USE_DISPLAY
 #if !defined SSD1306_128_32
     #error("Screen size incorrect, please fix Adafruit_SSD1306.h!");
+#endif
 #endif
 
 bool blinker = true;
